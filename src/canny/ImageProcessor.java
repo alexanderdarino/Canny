@@ -190,15 +190,35 @@ public class ImageProcessor {
     protected static BufferedImage magnitude(BufferedImage gradX, BufferedImage gradY)
     {
         assert gradX.getWidth() == gradY.getWidth() && gradX.getHeight() == gradY.getHeight();
+
+
+        double mag[][] = new double[gradX.getHeight()][gradX.getWidth()];
+
+
+        WritableRaster gradXRaster = gradX.getRaster(), gradYRaster = gradY.getRaster();
+        double min = Double.MAX_VALUE, max = Double.MIN_VALUE;
+        for (int y = 0; y < gradX.getHeight(); y++)
+        {
+            for (int x = 0; x < gradX.getWidth(); x++)
+            {
+                //int v = (int)Math.round((imgOut[y][x] - min) / (max - min) * 255);
+                //raster.setSample(x, y, 0, Math.round(Math.sqrt(Math.pow(128 - gradXRaster.getSample(x, y, 0), 2) + Math.pow(128 - gradYRaster.getSample(x, y, 0), 2)))/ Math.sqrt(2));
+                mag[y][x] = Math.sqrt(Math.pow(gradXRaster.getSample(x, y, 0), 2) + Math.pow(gradYRaster.getSample(x, y, 0), 2));
+                if (mag[y][x] < min)
+                    min = mag[y][x];
+                else if (mag[y][x] > max)
+                    max = mag[y][x];
+            }
+        }
+
         BufferedImage r_val = new BufferedImage(gradX.getWidth(), gradX.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
-        
-        WritableRaster raster = r_val.getRaster(), gradXRaster = gradX.getRaster(), gradYRaster = gradY.getRaster();
-       
+        WritableRaster raster = r_val.getRaster();
+
         for (int y = 0; y < r_val.getHeight(); y++)
         {
             for (int x = 0; x < r_val.getWidth(); x++)
             {
-                raster.setSample(x, y, 0, Math.round(Math.sqrt(Math.pow(128 - gradXRaster.getSample(x, y, 0), 2) + Math.pow(128 - gradYRaster.getSample(x, y, 0), 2)))/ Math.sqrt(2));
+                raster.setSample(x, y, 0, Math.round((mag[y][x] - min) / (max - min) * 255));
             }
         }
         return r_val;

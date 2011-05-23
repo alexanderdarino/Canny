@@ -1,4 +1,3 @@
-V0.1
 - Allow images to be selected via GUI
 - Display Gaussian Derivative Masks
 - Do not normalize images prior to producing final output
